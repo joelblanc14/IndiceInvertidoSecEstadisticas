@@ -1,0 +1,5 @@
+Terminos relacionados:
+Indice Invertido
+Hash Map
+Evitar condiciones carrera
+Máximizar rendimiento

@@ -1,0 +1,13 @@
+(1,1)	Partes que se pueden ejecutar concurrentemente:
+(1,2)	1.- Creación del Indice Invertido
+(1,3)	2.- Escritura a disco del Indice Invertido
+(1,4)	3.- Lectura del Indice Invertido
+(1,5)	4.- Procesamiento de una consulta
+(2,1)	El objetivo de esta práctica es la gestión concurrente de un Indice Invertido de las palabras de un conjunto de ficheros de texto
+(2,2)	El indice se implementa medianta un HashMap donde la clave es una palabra y el valor la lista de localizaciones
+(2,3)	Las localizaciones están compuestas por un id de fichero y un número de línea de texto
+(3,1)	Terminos relacionados:
+(3,2)	Indice Invertido
+(3,3)	Hash Map
+(3,4)	Evitar condiciones carrera
+(3,5)	Máximizar rendimiento

@@ -1,0 +1,5 @@
+Partes que se pueden ejecutar concurrentemente:
+1.- Creación del Indice Invertido
+2.- Escritura a disco del Indice Invertido
+3.- Lectura del Indice Invertido
+4.- Procesamiento de una consulta
