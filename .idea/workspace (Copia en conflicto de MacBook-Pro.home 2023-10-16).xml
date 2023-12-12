@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Indexing:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b7a0cf95-e2b8-424c-b312-1b106d6fd188" name="Default" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectId" id="1S0fHM1eKd7U4QBcWHaYicRIOAI" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Dropbox/Docencia/Grado_Informatica/Sistemas_Concurrentes_y_Paralelos_2023-24/Actualización_Temario/Ejemplos/Nuevos/FundamentosThreadsJava/RendimientoHashMap&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.32873562&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="Application.Small Example 2 Build Index">
+    <configuration default="true" type="tests" factoryName="Unittests">
+      <module name="Indexing" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;.&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="All Build Index" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="eps.scp.Indexing" />
+      <module name="IndiceInvertidoSec" />
+      <option name="PROGRAM_PARAMETERS" value="./Input/ ./Index/All" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Big Example Query" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="eps.scp.Query" />
+      <module name="IndiceInvertidoSec" />
+      <option name="PROGRAM_PARAMETERS" value="&quot;Mancha ingenioso Quijote de don hidalgo el&quot; ./Index/All" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Small Example 2 Build Index" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="eps.scp.Indexing" />
+      <module name="IndiceInvertidoSec" />
+      <option name="PROGRAM_PARAMETERS" value="./Input/SmallExample2 ./Index/SmallExample2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Small Example Build Index" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="eps.scp.Indexing" />
+      <module name="IndiceInvertidoSec" />
+      <option name="PROGRAM_PARAMETERS" value="./Input/SmallExample ./Index/SmallExample" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Small Example Query 2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="eps.scp.Query" />
+      <module name="IndiceInvertidoSec" />
+      <option name="PROGRAM_PARAMETERS" value="&quot;Indice Invertido Concurrente&quot; ./Index/SmallExample2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Small Example Query" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="eps.scp.Query" />
+      <module name="IndiceInvertidoSec" />
+      <option name="PROGRAM_PARAMETERS" value="&quot;Indice Invertido&quot; ./Index/SmallExample" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.All Build Index" />
+      <item itemvalue="Application.Big Example Query" />
+      <item itemvalue="Application.Small Example 2 Build Index" />
+      <item itemvalue="Application.Small Example Build Index" />
+      <item itemvalue="Application.Small Example Query 2" />
+      <item itemvalue="Application.Small Example Query" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b7a0cf95-e2b8-424c-b312-1b106d6fd188" name="Default" comment="" />
+      <created>1570471581823</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1570471581823</updated>
+      <workItem from="1695717447087" duration="2498000" />
+      <workItem from="1696849744390" duration="1016000" />
+      <workItem from="1696851448997" duration="15000" />
+      <workItem from="1696851744336" duration="664000" />
+      <workItem from="1696924474601" duration="521000" />
+      <workItem from="1696925892449" duration="554000" />
+      <workItem from="1696929172974" duration="1408000" />
+      <workItem from="1696944049581" duration="6111000" />
+      <workItem from="1697031928197" duration="29000" />
+      <workItem from="1697032046018" duration="2601000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java</url>
+          <line>607</line>
+          <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java</url>
+          <line>102</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java</url>
+          <line>585</line>
+          <option name="timeStamp" value="68" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="GetKeyOffsets(key)" />
+        <watch expression="(char)car" language="JAVA" />
+        <watch expression="outputDirectory + DFilesIdsName" language="JAVA" />
+      </configuration>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="361">
+        <watch expression="joined.substring(1,joined.length()-1)" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="585">
+        <watch expression="Hash.get(word)" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="608">
+        <watch expression="(matching.getValue()/querySize)*100" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="607">
+        <watch expression="(matching.getValue()/(float)querySize)" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="103">
+        <watch expression="getTotalLocations()" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="610">
+        <watch expression="getIndexFilesLine(location)" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="103">
+        <watch expression="getTotalLocations(Hash)" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="608">
+        <watch expression="getIndexFilesLine(location)" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="102">
+        <watch expression="getTotalWords()" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="102">
+        <watch expression="getTotalWords(Hash)" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/src/eps/scp/InvertedIndex.java" line="608">
+        <watch expression="location.getLine()" />
+      </inline-watch>
+    </watches-manager>
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>Indexing:jar</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>Indexing</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>org.apache.commons:commons-lang3:3.9</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
