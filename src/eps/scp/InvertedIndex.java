@@ -1,35 +1,30 @@
+    /* ---------------------------------------------------------------
+Práctica 3.
+Grau Enginyeria Informàtica
+Joel Blanc Iniesta
+Miquel Jordan Rodriguez
+--------------------------------------------------------------- */
+
 package eps.scp;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class InvertedIndex
 {
-    private static final int M = 1000;
-    private int contador = 0;
-
-    private int numThreads = 3;
-    // Definimos el semáforo
-    private final Semaphore semaphore = new Semaphore(1);
-
-    // Creamos un lock y una Condition
-    private final Lock lock = new ReentrantLock();
-    private final Condition condition = lock.newCondition();
-
     // Constantes
     public final String ANSI_RED = "\u001B[31m";
     public final String ANSI_GREEN = "\u001B[32m";
@@ -66,14 +61,33 @@ public class InvertedIndex
 
     // Estadisticas para verificar la correcta contrucción del indice invertido.
     private Statistics GlobalStatistics = new Statistics("=");
-    private AtomicLong TotalLocations = new AtomicLong(0);
-    private AtomicLong TotalWords = new AtomicLong(0);
-    private AtomicLong TotalLines = new AtomicLong(0);
-    private AtomicInteger TotalProcessedFiles = new AtomicInteger(0);
+    private long TotalLocations = 0;
+    private long TotalWords = 0;
+    private long TotalLines = 0;
+    private long TotalKeysFound = 0;
+    private int TotalProcessedFiles = 0;
 
-    final int CLineSize = 129;
-    final int CLineHeaderSize = 2;
-    final int CFieldSize = 10;
+
+    /*----------------------------------------Nuevos Parametros-------------------------------------------------------*/
+    //Uso del Phaser en la espera de los hilos secundarios en la fase de Build
+    private final Phaser phaser = new Phaser(1); // Inicializado con 1 por el hilo principal
+
+    //Uso de CountDownLatch en la espera de los hilos secundarios de la fase Load
+    private CountDownLatch latch;
+
+    private final Lock lock = new ReentrantLock(); //Cambiar por otro metodo de sincronización
+
+    private final Condition condition = lock.newCondition();
+
+    private int numThreads = 3;
+
+    //Uso del Semaphore en la espera de los hilos secundarios en la fase de Save
+    private final Semaphore semaphore = new Semaphore(0);
+    private int M = 1000;
+
+    CyclicBarrier cyclicBarrier; // Se deberà inicializar cuando sepamos el numero de hilos total
+
+    private int threadsFinishedCount = 0;
 
     // Getters
     public Map<Integer, String> getFiles() { return Files; }
@@ -83,24 +97,38 @@ public class InvertedIndex
         IndexDirPath = indexDirPath;
     }
     public long getTotalWords(Map hash){ return(hash.size()); }
-    public long getTotalLocations() { return TotalLocations.get(); }
-    public long getTotalWords() { return TotalWords.get(); }
-    public long getTotalLines() { return TotalLines.get(); }
-    public int getTotalProcessedFiles() { return TotalProcessedFiles.get(); }
+    public long getTotalLocations() { return TotalLocations; }
+    public long getTotalWords() { return TotalWords; }
+    public long getTotalLines() { return TotalLines; }
+    public int getTotalProcessedFiles() { return TotalProcessedFiles; }
+
+    public long getTotalKeysFound() {
+        return TotalKeysFound;
+    }
+
+    public Statistics getGlobalStatistics() {return GlobalStatistics;}
+
+    public void setTotalKeysFound(long totalKeys) {
+        TotalKeysFound = totalKeys;
+    }
 
 
     // Constructores
     public InvertedIndex() {
     }
-    public InvertedIndex(String InputPath) {
+    public InvertedIndex(String InputPath, int M) {
         this.InputDirPath = InputPath;
         this.IndexDirPath = DDefaultIndexDir;
+        this.M = M;
     }
 
-    public InvertedIndex(String inputDir, String indexDir) {
+    public InvertedIndex(String inputDir, String indexDir, int M) {
         this.InputDirPath = inputDir;
         this.IndexDirPath = indexDir;
+        this.M = M;
     }
+
+
 
     // Método para la construcción del indice invertido.
     //  1. Busca los ficheros de texto recursivamente en el directorio de entrada.
@@ -118,7 +146,7 @@ public class InvertedIndex
 
         // Comprobar que el resultado sea correcto.
         try {
-            assertEquals(getTotalWords(Hash), getTotalWords());
+            assertEquals(getTotalWords(Hash), getTotalKeysFound());
             assertEquals(getTotalLocations(Hash), getTotalLocations());
             assertEquals(getTotalFiles(Files), getTotalProcessedFiles());
             assertEquals(getTotalLines(IndexFilesLines), getTotalLines());
@@ -128,41 +156,32 @@ public class InvertedIndex
     }
 
     private void initializeCounters() {
-        TotalProcessedFiles = new AtomicInteger(0);
-        TotalLocations = new AtomicLong(0);
-        TotalLines = new AtomicLong(0);
-        TotalWords = new AtomicLong(0);
+        TotalProcessedFiles = 0;
+        TotalLocations = 0;
+        TotalLines = 0;
+        TotalKeysFound = 0;
+        TotalWords = 0;
     }
 
     private void processFilesWithThreads() {
         int fileId = 0;
         List<Thread> threads = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(FilesList.size()); // Inicializado con el número de hilos que se van a ejecutar
 
-        for (File file : FilesList) {
-            fileId++;
+        cyclicBarrier = new CyclicBarrier(FilesList.size(), () -> {
+            GlobalStatistics.print("GlobalStatistics", ANSI_GREEN); // Cuando termina imprime
+        });
+
+        for(File file: FilesList) {
             Files.put(fileId, file.getAbsolutePath());
-            int finalFileId = fileId;
-            threads.add(Thread.startVirtualThread(() -> {
-                addFileWords2Index(finalFileId, file);
-                latch.countDown(); // Señala que un hilo ha completado su ejecución
-            }));
+            int finalfileid= fileId;
+            threads.add(Thread.startVirtualThread(() ->
+                    addFileWords2Index(finalfileid, file)
+            ));
+            phaser.register();
+            fileId++;
         }
 
-        waitForThreadsToFinish(latch);
-    }
-
-    private void waitForThreadsToFinish(CountDownLatch latch) {
-        // Espera a que todos los hilos hayan completado su ejecución
-        while (latch.getCount() > 0) {
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                System.err.println("Error al esperar a que todos los hilos finalicen: " + e.getMessage());
-            }
-        }
-        // En este punto, todos los hilos han llamado a countDown()
-        // y el CountDownLatch ha alcanzado cero.
+        phaser.arriveAndAwaitAdvance();
     }
 
     // Calcula el número de ubicaciones diferentes de las palabras en los ficheros.
@@ -176,9 +195,6 @@ public class InvertedIndex
         while (keyIterator.hasNext() ) {
             String word = (String) keyIterator.next();
             locations += Hash.get(word).size();
-            //HashSet<Location> locs = Hash.get(word);
-            //String joined = String.join(";",locs.toString());
-            //System.out.printf(ANSI_BLUE+"[%d-%d] %s --> %s\n"+ANSI_RESET,locations-locs.size(),locations, word, joined);
         }
         return(locations);
     }
@@ -213,10 +229,6 @@ public class InvertedIndex
             System.err.printf("Directorio %s no existe.\n",file.getAbsolutePath());
     }
 
-    /*public void setBarrierSize(int size) {
-        cyclicBarrier = new CyclicBarrier(size);
-    }*/
-
     // Método para incorporar las palabras de un fichero de texto al indice invertido todos los ficheros
     // de la lista.
     //  1. Se lee cada un de las líneas de texto del fichero, se eliminan los caracteres especiales y se
@@ -228,19 +240,24 @@ public class InvertedIndex
     // También se genera una hasp con todas las líneas de los ficheros indexados mediante su localización
     // (idFile,Linea)
     public void addFileWords2Index(int fileId, File file) {
-        Statistics FileStatistics = new Statistics("_");
-        System.out.printf("Processing %3dth file %s (Path: %s)\n", fileId, file.getName(), file.getAbsolutePath());
-        TotalProcessedFiles.incrementAndGet();
-        FileStatistics.incProcessingFiles();
+
+        Statistics FileStatistics = new Statistics("-");
+        synchronized (this) {
+            System.out.printf("Processing %3dth file %s (Path: %s)\n", fileId, file.getName(), file.getAbsolutePath());
+            TotalProcessedFiles++;
+            FileStatistics.incProcessingFiles();
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             int lineNumber = 0;
+
             while ((line = br.readLine()) != null) {
                 lineNumber++;
-                TotalLines.incrementAndGet();
+                synchronized (this) {
+                    TotalLines++;
+                }
                 FileStatistics.incProcessedLines();
-                if (Indexing.Verbose) System.out.printf("Procesando linea %d fichero %d: ", lineNumber, fileId);
                 Location newLocation = new Location(fileId, lineNumber);
                 addIndexFilesLine(newLocation, line);
 
@@ -250,98 +267,80 @@ public class InvertedIndex
                 String[] words = filter_line.split("\\W+");
 
                 for (String word : words) {
-                    if (Indexing.Verbose) System.out.printf("%s ", word);
+
+                    if (FileStatistics.getProcessedWords() == M) {
+                        synchronized (this) {
+                            setMostPopularWord(FileStatistics);
+                            FileStatistics.print(file.getName(), ANSI_BLUE); // Imprime estadisticas parciales
+                        }
+                        synchronized (GlobalStatistics) {
+                            FileStatistics.decProcessingFiles();
+                            GlobalStatistics.addStatistics(FileStatistics); // Actualiza estadisticas globales
+                        }
+
+                        synchronized (this) {
+                            FileStatistics = new Statistics("_");
+                            FileStatistics.incProcessingFiles();     // Resetea estadísticas parciales
+                        }
+
+                        cyclicBarrier.await();
+                    }
+
                     word = word.toLowerCase();
-
-                    // Adquiere el semáforo
-                    try {
-                        semaphore.acquire();
-
+                    synchronized (this) {
                         HashSet<Location> locations = Hash.get(word);
                         if (locations == null) {
                             locations = new HashSet<>();
-                            if (!Hash.containsKey(word))
+                            if (!Hash.containsKey(word)){
                                 FileStatistics.incKeysFound();
+                                TotalKeysFound++;
+                            }
                             Hash.put(word, locations);
-                            TotalWords.incrementAndGet();
-                            FileStatistics.incProcessedWords();
                         }
-
+                        TotalWords++;   // Modificado!!
+                        FileStatistics.incProcessedWords();
                         int oldLocSize = locations.size();
                         locations.add(newLocation);
                         if (locations.size() > oldLocSize) {
-                            TotalLocations.incrementAndGet();
+                            TotalLocations++;
                             FileStatistics.incProcessedLocations();
                         }
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    } finally {
-                        // Libera el semáforo en un bloque finally para asegurar que se libere
-                        // incluso si ocurre una excepción.
-                        semaphore.release();
-                    }
-                    // Actualiza contadores y muestra resultados parciales y totales cada M palabras
-                    contador++;
-                    if (contador % M == 0) {
-                        showPartialAndTotalStatistics(FileStatistics, file.getName(), 130);
-
                     }
                 }
-                if (Indexing.Verbose) System.out.println();
             }
+
+            synchronized (this) {
+                FileStatistics.incProcessedFiles();
+                FileStatistics.decProcessingFiles();
+                setMostPopularWord(FileStatistics);
+                FileStatistics.print(file.getName(), ANSI_RED);
+            }
+            synchronized (GlobalStatistics) {
+                GlobalStatistics.addStatistics(FileStatistics);
+            }
+
+            threadsFinishedCount++;
+            cyclicBarrier.await(); // Para que el último hilo se pare en la barrera y así esta finalice
+
+            while (threadsFinishedCount < FilesList.size()) {
+                cyclicBarrier.await();
+            }
+
         } catch (FileNotFoundException e) {
             System.err.printf("Fichero %s no encontrado.\n", file.getAbsolutePath());
             e.printStackTrace();
         } catch (IOException e) {
             System.err.printf("Error lectura fichero %s.\n", file.getAbsolutePath());
             e.printStackTrace();
+        } catch (BrokenBarrierException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-        try {
-            semaphore.acquire();
-            FileStatistics.incProcessedFiles();
-            FileStatistics.decProcessingFiles();
-            setMostPopularWord(FileStatistics);
-            FileStatistics.print(file.getName());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } finally {
-            semaphore.release();
-        }
-
-        GlobalStatistics.addStatistics(FileStatistics);
+        phaser.arriveAndDeregister();
     }
-    private void showPartialAndTotalStatistics(Statistics fileStatistics, String fileName, int CLineSize) {
-        System.out.println(StringUtils.repeat("_", CLineSize));
-        System.out.printf("__ %s %s\n", StringUtils.center(fileName, CLineSize - CLineHeaderSize), StringUtils.repeat("_", CLineHeaderSize));
-        System.out.println(StringUtils.repeat("_", CLineSize));
-
-        // Muestra estadísticas parciales en azul
-        System.out.printf("%s__ Thread %d - Partial Statistics:\n", ANSI_BLUE, Thread.currentThread().getId());
-        System.out.printf("__ Processed Files:     %-" + CFieldSize + "d", fileStatistics.getProcessedFiles());
-        System.out.printf("__ Processing Files: %-" + CFieldSize + "d", fileStatistics.getProcessingFiles());
-        System.out.printf("__ Processed Lines:   %-" + CFieldSize + "d", fileStatistics.getProcessedLines());
-        System.out.printf("__ Processed Words: %-" + CFieldSize + "d\n", fileStatistics.getProcessedWords());
-        System.out.printf("__ Processed Locations: %-" + CFieldSize + "d", fileStatistics.getProcessedLocations());
-        System.out.printf("__ Found Keys:       %-" + CFieldSize + "d", fileStatistics.getKeysFound());
-        System.out.printf("__ Most Popular word: %-" + CFieldSize + "s", fileStatistics.getMostPopularWord());
-        System.out.printf("__ Locations:       %-" + CFieldSize + "d\n", fileStatistics.getMostPopularWordLocations());
-        System.out.println(StringUtils.repeat("_", CLineSize));
-        System.out.print("\033[00m"); // Restaura el color normal
-
-        // Muestra estadísticas totales en verde
-        System.out.printf("%s__ Total Statistics:\n", ANSI_GREEN);
-        System.out.printf("__ Ficheros procesados: %-" + CFieldSize + "d\n", getTotalProcessedFiles());
-        System.out.printf("__ Líneas procesadas:   %-" + CFieldSize + "d\n", getTotalLines());
-        System.out.printf("__ Palabras procesadas: %-" + CFieldSize + "d\n", getTotalWords());
-        System.out.printf("__ Ubicaciones encontradas: %-" + CFieldSize + "d\n", getTotalLocations());
-        System.out.println(StringUtils.repeat("_", CLineSize));
-        System.out.print("\033[00m"); // Restaura el color normal
-    }
-
 
     public synchronized void setMostPopularWord(Statistics stats) {
-        String maxWord = Collections.max(Hash.entrySet(), Comparator.comparingInt(entry -> entry.getValue().size())).getKey();
+        String maxWord = Collections.max(Hash.entrySet(), (entry1, entry2) -> entry1.getValue().size() - entry2.getValue().size()).getKey();
         stats.setMostPopularWord(maxWord);
         stats.setMostPopularWordLocations(Hash.get(maxWord).size());
     }
@@ -404,14 +403,14 @@ public class InvertedIndex
             signalThreadFinished();
         }));
 
-        waitForThreadsToFinish();
+        waitForThreadsToFinishWithCondition();
 
         Instant finish = Instant.now();
         long timeElapsed = Duration.between(start, finish).toMillis();  // in millis
         System.out.printf("[Save Index with %d keys] Total execution time: %.3f secs.\n", Hash.size(), timeElapsed / 1000.0);
     }
 
-    private void waitForThreadsToFinish() {
+    private void waitForThreadsToFinishWithCondition() {
         lock.lock();
         try {
             while (numThreads > 0) {
@@ -470,7 +469,6 @@ public class InvertedIndex
         Iterator<String> keyIterator = keySet.iterator();
         int keysPerFile = keySet.size() / numberOfFiles;
 
-        Phaser phaser = new Phaser(numberOfFiles);
 
         while (keyIterator.hasNext()) {
             Set<String> keysToSave = new HashSet<>();
@@ -478,12 +476,17 @@ public class InvertedIndex
                 keysToSave.add(keyIterator.next());
             }
 
-            saveInvertedIndexTask task = new saveInvertedIndexTask(keysToSave, outputDirectory, fileId, phaser);
+            saveInvertedIndexTask task = new saveInvertedIndexTask(keysToSave, outputDirectory, fileId);
             threads.add(Thread.startVirtualThread(task));
 
             fileId++;
         }
-        phaser.arriveAndAwaitAdvance(); // Espera a que todos los hilos lleguen a este punto
+
+        try {
+            semaphore.acquire(numberOfFiles);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Método para salvar una clave y sus ubicaciones en un fichero.
@@ -563,40 +566,36 @@ public class InvertedIndex
         Instant start = Instant.now();
 
         resetIndex();
-        CyclicBarrier barrier = new CyclicBarrier(4); // 3 + 1 para el hilo principal
+        latch = new CountDownLatch(3);
         List<Thread> threads = new ArrayList<>();
 
         threads.add(Thread.startVirtualThread(() -> {
             loadInvertedIndex(indexDirectory);
-            awaitBarrier(barrier);
+            latch.countDown();
         }));
 
         threads.add(Thread.startVirtualThread(() -> {
             loadFilesIds(indexDirectory);
-            awaitBarrier(barrier);
+            latch.countDown();
         }));
 
         threads.add(Thread.startVirtualThread(() -> {
             loadFilesLines(indexDirectory);
-            awaitBarrier(barrier);
+            latch.countDown();
         }));
 
         // Espera a que todos los hilos alcancen la barrera final
-        awaitBarrier(barrier);
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         Instant finish = Instant.now();
         long timeElapsed = Duration.between(start, finish).toMillis();  // en milisegundos
         System.out.printf("[Load Index with %d keys] Total execution time: %.3f secs.\n", Hash.size(), timeElapsed / 1000.0);
     }
-
-    private void awaitBarrier(CyclicBarrier barrier) {
-        try {
-            barrier.await();
-        } catch (InterruptedException | BrokenBarrierException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public void resetIndex()
     {
@@ -761,7 +760,9 @@ public class InvertedIndex
         IndexFilesLines.put(loc, line);
     }
 
-    //*********************************************NUEVO CÓDIGO************************************************************
+
+    /*----------------------------------------------Codigo nuevo------------------------------------------------------*/
+
     class loadIndexTask implements Runnable {
 
         private File file;
@@ -809,17 +810,16 @@ public class InvertedIndex
             //System.out.println("")
         }
     }
+
     class saveInvertedIndexTask implements Runnable {
         private final Set<String> keys;
         private final String outputDirectory;
         private final int fileId;
-        private final Phaser phaser;
 
-        public saveInvertedIndexTask(Set<String> keys, String outputDirectory, int fileId, Phaser phaser) {
+        public saveInvertedIndexTask(Set<String> keys, String outputDirectory, int fileId) {
             this.keys = keys;
             this.outputDirectory = outputDirectory;
             this.fileId = fileId;
-            this.phaser = phaser;
         }
 
         @Override
@@ -839,7 +839,7 @@ public class InvertedIndex
                 e.printStackTrace();
                 System.exit(-1);
             } finally {
-                phaser.arriveAndDeregister();
+                semaphore.release();
             }
         }
     }

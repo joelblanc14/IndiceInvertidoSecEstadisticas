@@ -1,3 +1,10 @@
+/* ---------------------------------------------------------------
+Práctica 3.
+Grau Enginyeria Informàtica
+Joel Blanc Iniesta
+Miquel Jordan Rodriguez
+--------------------------------------------------------------- */
+
 package eps.scp;
 
 import java.util.Objects;

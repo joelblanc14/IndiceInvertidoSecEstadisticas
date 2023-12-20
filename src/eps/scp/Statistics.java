@@ -1,3 +1,10 @@
+/* ---------------------------------------------------------------
+Práctica 3.
+Grau Enginyeria Informàtica
+Joel Blanc Iniesta
+Miquel Jordan Rodriguez
+--------------------------------------------------------------- */
+
 package eps.scp;
 
 import org.apache.commons.lang3.StringUtils;
@@ -72,9 +79,9 @@ public class Statistics {
         }
     }
 
-    public void print(String name)
+    public void print(String name, String color)
     {
-        System.out.print(color_blue);
+        System.out.print(color);
         System.out.println(StringUtils.repeat(c,CLineHeaderSize)+" "+name+" "+StringUtils.repeat(c,CLineSize-(CLineHeaderSize+name.length()+2)));
         print();
         System.out.println(StringUtils.repeat(c,CLineSize));

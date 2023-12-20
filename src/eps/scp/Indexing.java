@@ -1,3 +1,11 @@
+/* ---------------------------------------------------------------
+Práctica 3.
+Grau Enginyeria Informàtica
+Joel Blanc Iniesta
+Miquel Jordan Rodriguez
+--------------------------------------------------------------- */
+
+
 package eps.scp;
 
 import java.time.Duration;
@@ -17,12 +25,12 @@ public class Indexing
     {
         InvertedIndex hash;
 
-        if (args.length <2 || args.length>2)
-            System.err.println("Erro in Parameters. Usage: Indexing <SourceDirectory> [<Index_Directory>]");
-        if (args.length < 2)
-            hash = new InvertedIndex(args[0]);
+        if (args.length <3 || args.length>3)
+            System.err.println("Erro in Parameters. Usage: Indexing <SourceDirectory> [<Index_Directory>] [<M>]");
+        if (args.length < 3)
+            hash = new InvertedIndex(args[0], Integer.parseInt(args[1]));
         else
-            hash = new InvertedIndex(args[0], args[1]);
+            hash = new InvertedIndex(args[0], args[1], Integer.parseInt(args[2]));
 
         Instant start = Instant.now();
 
